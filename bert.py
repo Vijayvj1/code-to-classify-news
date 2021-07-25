@@ -21,6 +21,13 @@ def get_train_data(path):
     train_data = doc['cleanNews'].to_list()
     return train_data
 
+def get_time_stamp(path):
+    print("[Info] Time Stamp")
+    raw_data = pd.read_csv(path)
+    doc = raw_data.copy()
+    time_data = doc['Published On'].to_list()
+    return time_data
+
 
 def bert_train_topic():
     docs = get_train_data(props['data_path'])
@@ -48,6 +55,20 @@ def bert_train_topic():
     fig_tw.write_html("templates/topicWord.html")
     print('[Info] Chart Data Generated!!')
 
+def bert_train_dynamic_topic():
+    docs = get_train_data(props['data_path'])
+    timestamps = get_time_stamp(props['data_path'])
+    print(f"[Info] Number of documents = {len(docs)}")
+    topic_model = BERTopic(language="english", calculate_probabilities=True)
+    print("[Info] Training Started")
+    path = props['model_to_deploy']
+    print(f'[Info] Model Path - {path}')
+    topics, _ = BERTopic.load(path)
+    print("[Info] Training Done")
+    topics_over_time = topic_model.topics_over_time(docs, topics, timestamps, nr_bins=20)
+    fig_dynamic = topic_model.visualize_topics_over_time(topics_over_time, top_n_topics=20)
+    fig_dynamic.write_html("templates/dynamicTopic.html")
+
 
 def bert_predict(input_text):
     path = props['model_to_deploy']
@@ -60,4 +81,3 @@ def bert_predict(input_text):
     name_of_topic = topics_data.loc[topics_data['Topic'] == bert_pred[0][0], 'Name'].tolist()
     ret_text = name_of_topic[0]
     return str(ret_text)
-

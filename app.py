@@ -68,6 +68,11 @@ def word_viz():
     return render_template('topicWord.html')
 
 
+@app.route('/get_dynamic_topics')
+def dynamic_viz():
+    return render_template('dynamicTopic.html')
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
     # # int_features = [int(x) for x in request.form.values()]
@@ -77,15 +82,6 @@ def predict():
     raw_text = ' '.join(int_features)
     prediction_text = bert_predict(raw_text)
     return render_template('index.html', prediction_text='Topic {}'.format(prediction_text))
-
-
-@app.route('/results', methods=['POST'])
-def results():
-    data = request.get_json(force=True)
-    # prediction = model.predict([np.array(list(data.values()))])
-
-    output = 0
-    return jsonify(output)
 
 
 if __name__ == "__main__":
